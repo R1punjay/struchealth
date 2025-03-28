@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}About - Building Structural Health Prediction{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header">
+                <h2 class="mb-0"><i class="fas fa-info-circle me-2"></i>About This System</h2>
+            </div>
+            <div class="card-body">
+                <h3>How the Prediction System Works</h3>
+                <p>
+                    The Building Structural Health Prediction system uses machine learning algorithms to analyze and predict 
+                    the structural health of buildings based on critical engineering parameters. Our prediction model has been 
+                    trained on a comprehensive dataset of building properties and their observed structural health outcomes.
+                </p>
+
+                <div class="alert" style="background-color: #eeeeee; color: #333333; border-color: #cccccc;">
+                    <h4><i class="fas fa-cogs me-2"></i>Key Parameters</h4>
+                    <p>The following parameters are considered in our prediction model:</p>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-cubes me-2"></i>Grade of Concrete</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>
+                                    The compressive strength of concrete significantly affects the structural integrity. 
+                                    Higher grade concrete (M40, M45, M50) offers better durability and resistance to environmental factors.
+                                </p>
+                                <p class="small text-muted">
+                                    Available grades range from M20 (standard strength) to M50 (high strength) in our system.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-wave-square me-2"></i>Seismic Load</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>
+                                    Seismic loads represent the forces that structures experience during earthquakes. 
+                                    Buildings in higher seismic zones require more robust design considerations.
+                                </p>
+                                <p class="small text-muted">
+                                    Our system considers both the seismic zone (I-V) and a custom seismic load factor.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-vector-square me-2"></i>Types of Support</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>
+                                    The support structure significantly impacts how loads are distributed. The four main types are:
+                                </p>
+                                <ul>
+                                    <li><strong>One Side Fixed:</strong> One end is fixed while the other is free to rotate and translate.</li>
+                                    <li><strong>Both Side Fixed:</strong> Both ends are fixed, providing maximum stability and load resistance.</li>
+                                    <li><strong>Cantilever:</strong> Fixed at one end but free at the other, suitable for overhanging structures.</li>
+                                    <li><strong>Simply Support:</strong> Both ends are free to rotate but not to translate horizontally.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-cloud-sun me-2"></i>Environmental Conditions</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>
+                                    Environmental factors can accelerate structural deterioration:
+                                </p>
+                                <ul>
+                                    <li><strong>Normal:</strong> Standard conditions with minimal environmental stress.</li>
+                                    <li><strong>Coastal:</strong> Exposure to salt water and humidity.</li>
+                                    <li><strong>Chemical:</strong> Exposure to aggressive chemical environments.</li>
+                                    <li><strong>Freeze-Thaw:</strong> Cyclic freezing and thawing causing expansion damage.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Machine Learning Model</h3>
+                <p>
+                    Our system utilizes a Random Forest Regression algorithm, which excels at capturing complex non-linear relationships 
+                    between building parameters and structural health. The model was trained on a diverse dataset of building specifications 
+                    and their documented structural performance.
+                </p>
+
+                <h3>Prediction Accuracy</h3>
+                <p>
+                    While our predictive model provides valuable insights, it should be used as a supplementary tool rather than a replacement for 
+                    professional structural assessment. The predictions are based on general engineering principles and statistical patterns, 
+                    but each building has unique characteristics that might not be fully captured in the model.
+                </p>
+
+                <div class="alert" style="background-color: #e5e5e5; color: #555555; border-color: #aaaaaa;">
+                    <h5><i class="fas fa-exclamation-triangle me-2"></i>Important Disclaimer</h5>
+                    <p class="mb-0">
+                        This tool is intended for preliminary assessment only. Critical decisions about building safety 
+                        should always involve comprehensive on-site inspection by qualified structural engineers.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

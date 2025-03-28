@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+
+{% block title %}Building Structural Health Prediction{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Building Parameters</h3>
+            </div>
+            <div class="card-body">
+                <form id="prediction-form">
+                    <div class="mb-3">
+                        <label for="seismic-load-enabled" class="form-label">Seismic Load</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="seismic-load-enabled" id="seismic-load-on" value="1" checked>
+                            <label class="form-check-label" for="seismic-load-on">ON</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="seismic-load-enabled" id="seismic-load-off" value="0">
+                            <label class="form-check-label" for="seismic-load-off">OFF</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="seismic-load" class="form-label">Seismic Load Factor (0.16-0.36)</label>
+                        <input type="range" class="form-range" min="0.16" max="0.36" step="0.01" id="seismic-load" value="0.24" required>
+                        <div class="d-flex justify-content-between">
+                            <small>0.16 (Low)</small>
+                            <small id="seismic-load-value">0.24</small>
+                            <small>0.36 (High)</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="concrete-grade" class="form-label">Grade of Concrete</label>
+                        <select class="form-select" id="concrete-grade" required>
+                            <option value="" selected disabled>Select Concrete Grade</option>
+                            {% for grade in concrete_grades %}
+                            <option value="{{ grade }}">{{ grade }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Higher grade concrete provides better structural integrity.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="elevation" class="form-label">Elevation of the Building (meters)</label>
+                        <input type="number" class="form-control" id="elevation" min="0.1" max="500" step="0.1" value="3" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="applied-load" class="form-label">Load Applied (KN)</label>
+                        <input type="number" class="form-control" id="applied-load" min="10" max="1000" value="24" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="support-type" class="form-label">Type of Support</label>
+                        <select class="form-select" id="support-type" required>
+                            <option value="" selected disabled>Select Support Type</option>
+                            {% for support in support_types %}
+                            <option value="{{ support }}">{{ support }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="env-condition" class="form-label">Environmental Condition</label>
+                        <select class="form-select" id="env-condition" required>
+                            <option value="" selected disabled>Select Environmental Condition</option>
+                            {% for condition in env_conditions %}
+                            <option value="{{ condition }}">{{ condition }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-calculator me-2"></i>Calculate Structural Health
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div id="results-section" class="d-none">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h3 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Structural Health Assessment</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Structural Health Score -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Structural Health Score</h5>
+                        <div class="progress mb-2" style="height: 25px;">
+                            <div id="health-score-bar" class="progress-bar bg-secondary" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div class="text-center">
+                            <h4 id="health-score">0%</h4>
+                        </div>
+                    </div>
+
+                    <!-- Condition Assessment -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Condition Assessment</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Condition</h6>
+                                        <h4 id="condition-status" class="mb-0">-</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Safety Status</h6>
+                                        <h4 id="safety-status" class="mb-0">-</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deterioration Forecast -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Deterioration Forecast</h5>
+                        <div style="height: 200px;">
+                            <canvas id="deterioration-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Risk Assessment -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Risk Assessment</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <ul id="risk-factors" class="list-group list-group-flush">
+                                    <!-- Risk factors will be added here -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technical Recommendations -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Technical Recommendations</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <ul id="technical-recommendations" class="list-group list-group-flush">
+                                    <!-- Recommendations will be added here -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Analysis -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Detailed Analysis</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div id="detailed-analysis">
+                                    <!-- Detailed analysis will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Report Button -->
+                    <div class="text-center">
+                        <button id="download-report" class="btn btn-primary">
+                            <i class="fas fa-download me-2"></i>Download Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="initial-info" class="card shadow-sm">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>How It Works</h3>
+            </div>
+            <div class="card-body">
+                <p>This tool uses machine learning to predict the structural health of buildings based on various important parameters:</p>
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item"><i class="fas fa-check-circle text-secondary me-2"></i><strong>Grade of Concrete:</strong> Higher grades provide better strength.</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-secondary me-2"></i><strong>Seismic Load:</strong> Impacts how the building responds to earthquakes.</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-secondary me-2"></i><strong>Type of Support:</strong> Different support structures affect stability.</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-secondary me-2"></i><strong>Environmental Conditions:</strong> Affects durability over time.</li>
+                </ul>
+                <p>Fill in the form with your building's parameters to receive a health prediction score and recommendations.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Handle seismic load toggle
+    const seismicLoadEnabled = document.querySelectorAll('input[name="seismic-load-enabled"]');
+    const seismicLoadSlider = document.getElementById('seismic-load');
+    const seismicLoadValue = document.getElementById('seismic-load-value');
+    
+    seismicLoadEnabled.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === '0') {
+                seismicLoadSlider.value = '0.16';
+                seismicLoadValue.textContent = '0.16';
+                seismicLoadSlider.disabled = true;
+            } else {
+                seismicLoadSlider.disabled = false;
+            }
+        });
+    });
+
+    // Display the current value of the seismic load slider
+    seismicLoadSlider.addEventListener('input', function() {
+        seismicLoadValue.textContent = this.value;
+    });
+
+    // Handle form submission
+    document.getElementById('prediction-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form values
+        const seismicLoadEnabled = document.querySelector('input[name="seismic-load-enabled"]:checked').value;
+        const seismicLoad = document.getElementById('seismic-load').value;
+        const concreteGrade = document.getElementById('concrete-grade').value;
+        const elevation = document.getElementById('elevation').value;
+        const appliedLoad = document.getElementById('applied-load').value;
+        const supportType = document.getElementById('support-type').value;
+        const envCondition = document.getElementById('env-condition').value;
+        
+        // Prepare data for API call
+        const data = {
+            seismic_load_enabled: seismicLoadEnabled,
+            seismic_load: seismicLoad,
+            concrete_grade: concreteGrade,
+            elevation: elevation,
+            applied_load: appliedLoad,
+            support_type: supportType,
+            env_condition: envCondition
+        };
+        
+        // Show loading state
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.innerHTML;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+        submitButton.disabled = true;
+        
+        // Send API request
+        fetch('/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update health score bar and value
+            const healthScore = data.health_score;
+            const healthScoreBar = document.getElementById('health-score-bar');
+            const healthScoreDisplay = document.getElementById('health-score');
+            
+            healthScoreBar.style.width = `${healthScore}%`;
+            healthScoreBar.className = `progress-bar ${getHealthScoreColor(healthScore)}`;
+            healthScoreDisplay.textContent = `${healthScore}%`;
+            
+            // Update condition and safety status
+            const conditionStatus = document.getElementById('condition-status');
+            const safetyStatus = document.getElementById('safety-status');
+            
+            if (healthScore >= 70) {
+                conditionStatus.textContent = 'GOOD';
+                conditionStatus.className = 'text-success';
+                safetyStatus.textContent = 'SAFE';
+                safetyStatus.className = 'text-success';
+            } else if (healthScore >= 50) {
+                conditionStatus.textContent = 'MODERATE';
+                conditionStatus.className = 'text-warning';
+                safetyStatus.textContent = 'ACTIONS REQUIRED';
+                safetyStatus.className = 'text-warning';
+            } else {
+                conditionStatus.textContent = 'BAD';
+                conditionStatus.className = 'text-danger';
+                safetyStatus.textContent = 'UNSAFE';
+                safetyStatus.className = 'text-danger';
+            }
+            
+            // Update deterioration forecast
+            updateDeteriorationChart(healthScore);
+            
+            // Update risk factors
+            updateRiskFactors(data.risk_factors);
+            
+            // Update technical recommendations
+            updateTechnicalRecommendations(data.recommendations);
+            
+            // Update detailed analysis
+            updateDetailedAnalysis(data.analysis);
+            
+            // Show results section
+            document.getElementById('results-section').classList.remove('d-none');
+            document.getElementById('initial-info').classList.add('d-none');
+            
+            // Reset button
+            submitButton.innerHTML = originalButtonText;
+            submitButton.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+            submitButton.innerHTML = originalButtonText;
+            submitButton.disabled = false;
+        });
+    });
+    
+    function getHealthScoreColor(score) {
+        if (score >= 70) return 'bg-success';
+        if (score >= 50) return 'bg-warning';
+        return 'bg-danger';
+    }
+
+    function updateDeteriorationChart(initialHealth) {
+        const ctx = document.getElementById('deterioration-chart').getContext('2d');
+        
+        // Generate data points for 50 years (10 units of 5 years)
+        const years = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+        const deterioration = [0]; // Start at 0% deterioration
+        let currentDeterioration = 0;
+        
+        // Calculate deterioration rate based on initial health
+        const deteriorationRate = (100 - initialHealth) / 10; // More deterioration for lower health
+        
+        // Simulate deterioration over time
+        for (let i = 1; i < years.length; i++) {
+            currentDeterioration = Math.min(100, currentDeterioration + (deteriorationRate + Math.random() * 3));
+            deterioration.push(currentDeterioration);
+        }
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [{
+                    label: 'Deterioration (%)',
+                    data: deterioration,
+                    borderColor: 'rgb(102, 102, 102)',
+                    backgroundColor: 'rgba(102, 102, 102, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20
+                        },
+                        title: {
+                            display: true,
+                            text: 'Deterioration (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time (Years)'
+                        },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateRiskFactors(riskFactors) {
+        const riskList = document.getElementById('risk-factors');
+        riskList.innerHTML = '';
+        
+        riskFactors.forEach(risk => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            const riskText = risk.replace('⚠️', '').trim();
+            li.innerHTML = `<i class="fas fa-exclamation-triangle text-secondary me-2"></i>${riskText}`;
+            riskList.appendChild(li);
+        });
+    }
+
+    function updateTechnicalRecommendations(recommendations) {
+        const recommendationsList = document.getElementById('technical-recommendations');
+        recommendationsList.innerHTML = '';
+        
+        recommendations.forEach(rec => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.innerHTML = `<i class="fas fa-check-circle text-secondary me-2"></i>${rec}`;
+            recommendationsList.appendChild(li);
+        });
+    }
+
+    function updateDetailedAnalysis(analysis) {
+        const analysisDiv = document.getElementById('detailed-analysis');
+        analysisDiv.innerHTML = analysis;
+    }
+
+    // Handle download report
+    document.getElementById('download-report').addEventListener('click', function() {
+        // Get current form data
+        const seismicLoadEnabled = document.querySelector('input[name="seismic-load-enabled"]:checked').value;
+        const seismicLoad = document.getElementById('seismic-load').value;
+        const concreteGrade = document.getElementById('concrete-grade').value;
+        const elevation = document.getElementById('elevation').value;
+        const appliedLoad = document.getElementById('applied-load').value;
+        const supportType = document.getElementById('support-type').value;
+        const envCondition = document.getElementById('env-condition').value;
+        
+        // Get current results
+        const healthScore = parseFloat(document.getElementById('health-score').textContent);
+        const riskFactors = Array.from(document.getElementById('risk-factors').children)
+            .map(li => li.textContent.replace('⚠️', '').trim());
+        const recommendations = Array.from(document.getElementById('technical-recommendations').children)
+            .map(li => li.textContent.trim());
+        const analysis = document.getElementById('detailed-analysis').innerHTML;
+        
+        // Prepare data for API call
+        const data = {
+            seismic_load_enabled: seismicLoadEnabled,
+            seismic_load: seismicLoad,
+            concrete_grade: concreteGrade,
+            elevation: elevation,
+            applied_load: appliedLoad,
+            support_type: supportType,
+            env_condition: envCondition,
+            health_score: healthScore,
+            risk_factors: riskFactors,
+            recommendations: recommendations,
+            analysis: analysis
+        };
+        
+        // Show loading state
+        const downloadButton = this;
+        const originalButtonText = downloadButton.innerHTML;
+        downloadButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating Report...';
+        downloadButton.disabled = true;
+        
+        // Send API request
+        fetch('/download-report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            // Create a link to download the file
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `structural_health_report_${new Date().toISOString().slice(0,19).replace(/[:]/g, '')}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+            
+            // Reset button
+            downloadButton.innerHTML = originalButtonText;
+            downloadButton.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while generating the report. Please try again.');
+            downloadButton.innerHTML = originalButtonText;
+            downloadButton.disabled = false;
+        });
+    });
+</script>
+{% endblock %} 

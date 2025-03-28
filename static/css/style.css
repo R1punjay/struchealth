@@ -1,0 +1,165 @@
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f2f2f2;
+    color: #333333;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.4rem;
+}
+
+.card {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s;
+    border: none;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    font-weight: 600;
+    background-color: #4a4a4a;
+    color: #ffffff;
+}
+
+/* Form Styles */
+.form-label {
+    font-weight: 600;
+    color: #444444;
+}
+
+.form-select, .form-control {
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #bbbbbb;
+    background-color: #f8f8f8;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: #666666;
+    box-shadow: 0 0 0 0.25rem rgba(102, 102, 102, 0.25);
+}
+
+.btn-primary {
+    background-color: #555555;
+    border-color: #555555;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #333333;
+    border-color: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Gauge Chart Styles */
+.gauge-container {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.gauge-value {
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: #333333;
+}
+
+/* Results Styling */
+#health-status {
+    font-weight: 700;
+    color: #555555;
+}
+
+.recommendations-container {
+    background-color: #eeeeee;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+/* Footer */
+.footer {
+    margin-top: 30px;
+    background-color: #444444 !important;
+    color: #dddddd !important;
+}
+
+.footer .text-muted {
+    color: #dddddd !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .gauge-container {
+        width: 160px;
+        height: 80px;
+    }
+    
+    .gauge-value {
+        font-size: 20px;
+    }
+}
+
+/* Animation for Loading */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-pulse {
+    animation: pulse 1.5s infinite;
+}
+
+/* Parameter Cards */
+.parameter-card {
+    background-color: #eeeeee;
+    border-left: 4px solid #666666;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+/* Health status color coding - modified to use grayscale for most with only critical in red */
+.health-status-excellent {
+    color: #444444;
+}
+
+.health-status-good {
+    color: #555555;
+}
+
+.health-status-fair {
+    color: #777777;
+}
+
+.health-status-poor {
+    color: #999999;
+}
+
+.health-status-critical {
+    color: #a94442;
+} 
